@@ -4,9 +4,10 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Trash, Sparkles, Film, Tv, Video, X } from "lucide-react"
+import { Plus, Search, Trash, Sparkles, Film, Tv, X } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreVertical } from "lucide-react"
+import { CineLogo } from "@/components/cine/CineLogo"
 
 interface CineHeaderProps {
   searchTerm: string
@@ -42,7 +43,7 @@ export function CineHeader({
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           <div className="flex items-center gap-2 md:gap-4">
-            <Video className="h-8 w-8 text-primary" />
+            <CineLogo className="h-8 w-8 text-primary" />
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">CineList</h1>
           </div>
           <div className="flex items-center gap-2">
