@@ -26,7 +26,7 @@ const MovieResultSchema = z.object({
     imdbRating: z.string().describe('The IMDb rating, as a string.'),
     genre: z.array(z.string()).describe('A list of genres.'),
     plot: z.string().describe('A brief summary of the plot.'),
-    poster: z.string().describe('A publicly accessible URL for the movie poster image.'),
+    poster: z.string().describe('A publicly accessible URL for the movie poster image. Prioritize finding a URL from http://www.impawards.com. If no poster is available, use "https://placehold.co/300x450.png".'),
 });
 
 const SearchMoviesOutputSchema = z.array(MovieResultSchema);
@@ -46,7 +46,11 @@ const prompt = ai.definePrompt({
   
   A user will provide a search query. Find up to 5 of the most relevant movies or TV shows matching this query.
   
-  For each result, provide the requested information. Make sure to accurately identify if it's a "movie" or a "tv" series. It is very important to find a real, publicly accessible URL for the poster image. The ID should be the IMDb ID.
+  For each result, provide the requested information. Make sure to accurately identify if it's a "movie" or a "tv" series. 
+  
+  It is very important to find a real, publicly accessible URL for the poster image. Prioritize finding a poster from http://www.impawards.com. If you cannot find a poster from that site or any other, you must use "https://placehold.co/300x450.png" as the poster URL.
+  
+  The ID should be the IMDb ID.
 
   User Query: {{{query}}}`,
 });
