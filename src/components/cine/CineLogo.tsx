@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -17,12 +16,17 @@ export function CineLogo({ className, ...props }: React.SVGProps<SVGSVGElement>)
       className={cn("h-8 w-8", className)}
       {...props}
     >
-      <path d="M20.5 8.5 16 13l-3.41-3.41" />
-      <path d="M4 4h16v16H4z" />
-      <path d="m14.5 4.5 6 6" />
-      <path d="m11.5 4.5 6 6" />
-      <path d="m8.5 4.5 6 6" />
-      <path d="m5.5 4.5 6 6" />
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="12" r="3" />
+        <line x1="12" y1="1" x2="12" y2="3" />
+        <line x1="12" y1="21" x2="12" y2="23" />
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+        <line x1="1" y1="12" x2="3" y2="12" />
+        <line x1="21" y1="12" x2="23" y2="12" />
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        <path d="m9 12 2 2 4-4" />
     </svg>
   )
 }
