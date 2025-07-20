@@ -25,6 +25,7 @@ const MovieResultSchema = z.object({
     imdbRating: z.string().describe('The IMDb rating, as a string.'),
     genre: z.array(z.string()).describe('A list of genres.'),
     plot: z.string().describe('A brief summary of the plot.'),
+    poster: z.string().url().describe('A publicly accessible URL for the movie poster image.'),
 });
 
 const SearchMoviesOutputSchema = z.array(MovieResultSchema);
@@ -45,8 +46,8 @@ const prompt = ai.definePrompt({
   
   A user will provide a search query. Find up to 5 of the most relevant movies or TV shows matching this query.
   
-  For each result, provide the requested information. Make sure to accurately identify if it's a "movie" or a "tv" series.
-  
+  For each result, provide the requested information. Make sure to accurately identify if it's a "movie" or a "tv" series. It is very important to find a real, publicly accessible URL for the poster image.
+
   User Query: {{{query}}}`,
 });
 

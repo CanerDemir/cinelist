@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { MediaItem } from "@/lib/types"
 import { Check, Plus, Search, Loader2 } from "lucide-react"
-import { searchMovies } from "@/ai/flows/search-movies-flow"
+import { searchMovies, SearchMoviesOutput } from "@/ai/flows/search-movies-flow"
 import { useToast } from "@/hooks/use-toast"
 
 interface AddMediaDialogProps {
@@ -25,7 +25,7 @@ interface AddMediaDialogProps {
   currentList: MediaItem[]
 }
 
-type SearchResultItem = Omit<MediaItem, 'watched' | 'poster' | 'data_ai_hint'>;
+type SearchResultItem = SearchMoviesOutput[0];
 
 export function AddMediaDialog({
   open,
@@ -46,9 +46,7 @@ export function AddMediaDialog({
     setIsLoading(true)
     try {
       const results = await searchMovies({ query })
-      // The API returns partial data, so we create a temporary ID
-      // The final ID is set when adding the item to the list
-      setSearchResults(results.map(r => ({...r, id: r.title + r.year})))
+      setSearchResults(results)
     } catch (error) {
       console.error("Failed to search for movies:", error)
       toast({
@@ -87,7 +85,6 @@ export function AddMediaDialog({
       ...item,
       id: `${item.title}-${item.year}`, // Create a more stable ID
       watched: false,
-      poster: `https://placehold.co/500x750/121212/A7FFEB.png`,
       data_ai_hint: item.genre.slice(0, 2).join(' '),
     };
     onAddItem(newItem);
@@ -117,15 +114,15 @@ export function AddMediaDialog({
         <ScrollArea className="h-[400px] mt-4">
           <div className="flex flex-col gap-4 pr-4">
             {searchResults.map(item => {
-              const isAdded = currentListIds.has(item.id)
+              const isAdded = currentListIds.has(`${item.title}-${item.year}`)
               return (
                 <div key={item.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                   <Image
-                    src={`https://placehold.co/60x90/121212/A7FFEB.png`}
+                    src={item.poster || `https://placehold.co/60x90.png`}
                     alt={item.title}
                     width={60}
                     height={90}
-                    className="rounded-md object-cover"
+                    className="rounded-md object-cover bg-muted"
                     data-ai-hint={item.genre.slice(0,2).join(' ')}
                   />
                   <div className="flex-1">
