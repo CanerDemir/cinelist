@@ -25,7 +25,7 @@ const MovieResultSchema = z.object({
     imdbRating: z.string().describe('The IMDb rating, as a string.'),
     genre: z.array(z.string()).describe('A list of genres.'),
     plot: z.string().describe('A brief summary of the plot.'),
-    poster: z.string().url().describe('A publicly accessible URL for the movie poster image.'),
+    poster: z.string().describe('A publicly accessible URL for the movie poster image.'),
 });
 
 const SearchMoviesOutputSchema = z.array(MovieResultSchema);
