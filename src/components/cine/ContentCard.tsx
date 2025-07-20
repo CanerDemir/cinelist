@@ -4,7 +4,8 @@ import Image from "next/image"
 import type { MediaItem } from "@/lib/types"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { CheckCircle2, Circle } from "lucide-react"
+import { CheckCircle2, Circle, Star } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 interface ContentCardProps {
   item: MediaItem
@@ -33,6 +34,13 @@ export function ContentCard({ item, onToggleWatched, onSelect }: ContentCardProp
           <h3 className="font-bold text-base truncate">{item.title}</h3>
           <p className="text-sm text-neutral-300">{item.year}</p>
         </div>
+        <Badge
+          variant="secondary"
+          className="absolute top-2 left-2 bg-black/50 text-white backdrop-blur-sm border-yellow-400"
+        >
+          <Star className="w-3 h-3 mr-1 text-yellow-400" />
+          {item.imdbRating}
+        </Badge>
         <div 
           className="absolute top-2 right-2"
           onClick={(e) => {
