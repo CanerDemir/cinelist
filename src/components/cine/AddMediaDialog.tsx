@@ -83,14 +83,13 @@ export function AddMediaDialog({
   const handleAddItem = (item: SearchResultItem) => {
      const newItem: MediaItem = {
       ...item,
-      id: `${item.title}-${item.year}`, // Create a more stable ID
       watched: false,
       data_ai_hint: item.genre.slice(0, 2).join(' '),
     };
     onAddItem(newItem);
   }
 
-  const currentListIds = useMemo(() => new Set(currentList.map(item => `${item.title}-${item.year}`)), [currentList])
+  const currentListIds = useMemo(() => new Set(currentList.map(item => item.id)), [currentList])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,7 +113,7 @@ export function AddMediaDialog({
         <ScrollArea className="h-[400px] mt-4">
           <div className="flex flex-col gap-4 pr-4">
             {searchResults.map(item => {
-              const isAdded = currentListIds.has(`${item.title}-${item.year}`)
+              const isAdded = currentListIds.has(item.id)
               return (
                 <div key={item.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                   <Image

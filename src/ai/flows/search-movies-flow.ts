@@ -17,6 +17,7 @@ const SearchMoviesInputSchema = z.object({
 export type SearchMoviesInput = z.infer<typeof SearchMoviesInputSchema>;
 
 const MovieResultSchema = z.object({
+    id: z.string().describe('A unique ID for the movie or TV series, preferably from a database like IMDb (e.g., tt0111161).'),
     title: z.string().describe('The full title of the movie or TV series.'),
     type: z.enum(['movie', 'tv']).describe("The type of media, either 'movie' or 'tv' series."),
     year: z.string().describe('The release year or range of years for a TV series.'),
@@ -34,8 +35,7 @@ export type SearchMoviesOutput = z.infer<typeof SearchMoviesOutputSchema>;
 
 export async function searchMovies(input: SearchMoviesInput): Promise<SearchMoviesOutput> {
   const result = await searchMoviesFlow(input);
-  // The AI doesn't know about our internal IDs, so we add them here.
-  return result.map(item => ({...item, id: uuidv4()}));
+  return result;
 }
 
 const prompt = ai.definePrompt({
@@ -46,7 +46,7 @@ const prompt = ai.definePrompt({
   
   A user will provide a search query. Find up to 5 of the most relevant movies or TV shows matching this query.
   
-  For each result, provide the requested information. Make sure to accurately identify if it's a "movie" or a "tv" series. It is very important to find a real, publicly accessible URL for the poster image.
+  For each result, provide the requested information. Make sure to accurately identify if it's a "movie" or a "tv" series. It is very important to find a real, publicly accessible URL for the poster image. The ID should be the IMDb ID.
 
   User Query: {{{query}}}`,
 });

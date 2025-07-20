@@ -85,9 +85,8 @@ export default function Home() {
   }
 
   const handleAddItem = (item: MediaItem) => {
-    const itemKey = `${item.title}-${item.year}`;
-    if (!mediaItems.find(mi => `${mi.title}-${mi.year}` === itemKey)) {
-      setMediaItems(prevItems => [...prevItems, { ...item, watched: false, id: itemKey }])
+    if (!mediaItems.find(mi => mi.id === item.id)) {
+      setMediaItems(prevItems => [...prevItems, { ...item, watched: false }])
       toast({
         title: "Added to list",
         description: `"${item.title}" has been added to your watchlist.`,
