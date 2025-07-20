@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 import Image from "next/image"
 import {
   Dialog,
@@ -14,8 +14,9 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { MediaItem } from "@/lib/types"
-import { ALL_MEDIA } from "@/lib/data"
-import { Check, Plus, Search } from "lucide-react"
+import { Check, Plus, Search, Loader2 } from "lucide-react"
+import { searchMovies } from "@/ai/flows/search-movies-flow"
+import { useToast } from "@/hooks/use-toast"
 
 interface AddMediaDialogProps {
   open: boolean
@@ -24,6 +25,8 @@ interface AddMediaDialogProps {
   currentList: MediaItem[]
 }
 
+type SearchResultItem = Omit<MediaItem, 'watched' | 'poster' | 'data_ai_hint'>;
+
 export function AddMediaDialog({
   open,
   onOpenChange,
@@ -31,15 +34,66 @@ export function AddMediaDialog({
   currentList,
 }: AddMediaDialogProps) {
   const [searchTerm, setSearchTerm] = useState("")
+  const [searchResults, setSearchResults] = useState<SearchResultItem[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
-  const searchResults = useMemo(() => {
-    if (!searchTerm) return []
-    return ALL_MEDIA.filter(item =>
-      item.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  }, [searchTerm])
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query) {
+      setSearchResults([])
+      return
+    }
+    setIsLoading(true)
+    try {
+      const results = await searchMovies({ query })
+      // The API returns partial data, so we create a temporary ID
+      // The final ID is set when adding the item to the list
+      setSearchResults(results.map(r => ({...r, id: r.title + r.year})))
+    } catch (error) {
+      console.error("Failed to search for movies:", error)
+      toast({
+        variant: "destructive",
+        title: "Search Failed",
+        description: "Could not fetch movie results. Please try again.",
+      })
+      setSearchResults([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [toast])
 
-  const currentListIds = useMemo(() => new Set(currentList.map(item => item.id)), [currentList])
+  const debouncedSearch = useMemo(() => {
+    let timeoutId: NodeJS.Timeout
+    return (query: string) => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        handleSearch(query)
+      }, 500)
+    }
+  }, [handleSearch])
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value
+    setSearchTerm(query)
+    if(query.length > 2) {
+        debouncedSearch(query)
+    } else {
+        setSearchResults([]);
+    }
+  }
+
+  const handleAddItem = (item: SearchResultItem) => {
+     const newItem: MediaItem = {
+      ...item,
+      id: `${item.title}-${item.year}`, // Create a more stable ID
+      watched: false,
+      poster: `https://placehold.co/500x750/121212/A7FFEB.png`,
+      data_ai_hint: item.genre.slice(0, 2).join(' '),
+    };
+    onAddItem(newItem);
+  }
+
+  const currentListIds = useMemo(() => new Set(currentList.map(item => `${item.title}-${item.year}`)), [currentList])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -55,9 +109,10 @@ export function AddMediaDialog({
           <Input
             placeholder="Search for titles..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleInputChange}
             className="pl-10"
           />
+          {isLoading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin" />}
         </div>
         <ScrollArea className="h-[400px] mt-4">
           <div className="flex flex-col gap-4 pr-4">
@@ -66,12 +121,12 @@ export function AddMediaDialog({
               return (
                 <div key={item.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                   <Image
-                    src={item.poster}
+                    src={`https://placehold.co/60x90/121212/A7FFEB.png`}
                     alt={item.title}
                     width={60}
                     height={90}
                     className="rounded-md object-cover"
-                    data-ai-hint={item.data_ai_hint}
+                    data-ai-hint={item.genre.slice(0,2).join(' ')}
                   />
                   <div className="flex-1">
                     <h3 className="font-semibold">{item.title}</h3>
@@ -79,7 +134,7 @@ export function AddMediaDialog({
                   </div>
                   <Button
                     size="sm"
-                    onClick={() => onAddItem(item)}
+                    onClick={() => handleAddItem(item)}
                     disabled={isAdded}
                     variant={isAdded ? 'secondary' : 'default'}
                   >
@@ -89,7 +144,7 @@ export function AddMediaDialog({
                 </div>
               )
             })}
-             {searchTerm && searchResults.length === 0 && (
+             {!isLoading && searchTerm && searchResults.length === 0 && (
               <div className="text-center py-10 text-muted-foreground">
                 <p>No results for "{searchTerm}".</p>
               </div>

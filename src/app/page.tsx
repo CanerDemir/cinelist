@@ -10,6 +10,7 @@ import { ContentCard } from "@/components/cine/ContentCard"
 import { ContentDetailsDialog } from "@/components/cine/ContentDetailsDialog"
 import { AddMediaDialog } from "@/components/cine/AddMediaDialog"
 import { SkeletonGrid } from "@/components/cine/SkeletonGrid"
+import { useToast } from "@/hooks/use-toast"
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false)
@@ -19,6 +20,7 @@ export default function Home() {
   const [typeFilter, setTypeFilter] = useState("all") // 'all', 'movie', 'tv'
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     setIsMounted(true)
@@ -35,8 +37,8 @@ export default function Home() {
     return mediaItems.filter(item => {
       const matchesSearch =
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.director.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.actors.some(actor => actor.toLowerCase().includes(searchTerm.toLowerCase()))
+        (item.director && item.director.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.actors && item.actors.some(actor => actor.toLowerCase().includes(searchTerm.toLowerCase())))
       
       const matchesStatus =
         statusFilter === "all" ||
@@ -62,8 +64,19 @@ export default function Home() {
   }
 
   const handleAddItem = (item: MediaItem) => {
-    if (!mediaItems.find(mi => mi.id === item.id)) {
-      setMediaItems(prevItems => [...prevItems, { ...item, watched: false }])
+    const itemKey = `${item.title}-${item.year}`;
+    if (!mediaItems.find(mi => `${mi.title}-${mi.year}` === itemKey)) {
+      setMediaItems(prevItems => [...prevItems, { ...item, watched: false, id: itemKey }])
+      toast({
+        title: "Added to list",
+        description: `"${item.title}" has been added to your watchlist.`,
+      })
+    } else {
+       toast({
+        variant: "destructive",
+        title: "Already in list",
+        description: `"${item.title}" is already in your watchlist.`,
+      })
     }
   }
 
