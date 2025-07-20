@@ -132,7 +132,7 @@ export function AddMediaDialog({
               return (
                 <div key={item.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                   <Image
-                    src={item.poster || `https://placehold.co/60x90.png`}
+                    src={item.poster || "https://placehold.co/60x90.png"}
                     alt={item.title}
                     width={60}
                     height={90}
