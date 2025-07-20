@@ -84,8 +84,6 @@ export function AddMediaDialog({
      const newItem: MediaItem = {
       ...item,
       watched: false,
-      poster: `https://placehold.co/500x750.png`,
-      data_ai_hint: item.genre.slice(0, 2).join(' '),
     };
     onAddItem(newItem);
   }
@@ -118,12 +116,11 @@ export function AddMediaDialog({
               return (
                 <div key={item.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                   <Image
-                    src={`https://placehold.co/60x90.png`}
+                    src={item.poster || `https://placehold.co/60x90.png`}
                     alt={item.title}
                     width={60}
                     height={90}
                     className="rounded-md object-cover bg-muted"
-                    data-ai-hint={item.genre.slice(0,2).join(' ')}
                   />
                   <div className="flex-1">
                     <h3 className="font-semibold">{item.title}</h3>
