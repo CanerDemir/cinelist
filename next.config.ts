@@ -1,6 +1,12 @@
 import type {NextConfig} from 'next';
 
+const isGithubPages = process.env.DEPLOY_ENV === 'GH_PAGES';
+const repoName = 'cinelist';
+
 const nextConfig: NextConfig = {
+  output: 'export',
+  basePath: isGithubPages ? `/${repoName}` : '',
+  assetPrefix: isGithubPages ? `/${repoName}/` : '',
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
@@ -9,6 +15,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
