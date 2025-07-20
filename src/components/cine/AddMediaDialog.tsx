@@ -73,7 +73,6 @@ export function AddMediaDialog({
   const handleClearSearch = () => {
     setSearchTerm("");
     setSearchResults([]);
-    // cancel any pending debounced search
     debouncedSearch(""); 
   };
   
