@@ -1,9 +1,10 @@
+
 "use client"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Trash, Sparkles, Film, Tv, Video } from "lucide-react"
+import { Plus, Search, Trash, Sparkles, Film, Tv, Video, X } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreVertical } from "lucide-react"
 
@@ -75,8 +76,18 @@ export function CineHeader({
               placeholder="Search by title, actor, director..."
               value={searchTerm}
               onChange={e => onSearchTermChange(e.target.value)}
-              className="pl-10"
+              className="pl-10 pr-10"
             />
+            {searchTerm && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
+                onClick={() => onSearchTermChange("")}
+              >
+                <X className="h-5 w-5 text-muted-foreground" />
+              </Button>
+            )}
           </div>
           <Select value={typeFilter} onValueChange={onTypeFilterChange}>
             <SelectTrigger>
