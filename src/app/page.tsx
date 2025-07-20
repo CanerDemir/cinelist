@@ -11,6 +11,17 @@ import { ContentDetailsDialog } from "@/components/cine/ContentDetailsDialog"
 import { AddMediaDialog } from "@/components/cine/AddMediaDialog"
 import { SkeletonGrid } from "@/components/cine/SkeletonGrid"
 import { useToast } from "@/hooks/use-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false)
@@ -19,6 +30,7 @@ export default function Home() {
   const [statusFilter, setStatusFilter] = useState("all") // 'all', 'watched', 'unwatched'
   const [typeFilter, setTypeFilter] = useState("all") // 'all', 'movie', 'tv'
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null)
+  const [itemToDelete, setItemToDelete] = useState<MediaItem | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const { toast } = useToast()
 
@@ -61,6 +73,15 @@ export default function Home() {
         item.id === id ? { ...item, watched: !item.watched } : item
       )
     )
+  }
+  
+  const handleDeleteItem = (id: string) => {
+    setMediaItems(prevItems => prevItems.filter(item => item.id !== id));
+    toast({
+        title: "Removed from list",
+        description: `The item has been removed from your watchlist.`,
+    })
+    setItemToDelete(null);
   }
 
   const handleAddItem = (item: MediaItem) => {
@@ -115,6 +136,7 @@ export default function Home() {
                 item={item}
                 onToggleWatched={handleToggleWatched}
                 onSelect={() => setSelectedItem(item)}
+                onDelete={() => setItemToDelete(item)}
               />
             ))}
           </div>
@@ -136,6 +158,22 @@ export default function Home() {
         onAddItem={handleAddItem}
         currentList={mediaItems}
       />
+      <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove "{itemToDelete?.title}" from your watchlist. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setItemToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => itemToDelete && handleDeleteItem(itemToDelete.id)}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
